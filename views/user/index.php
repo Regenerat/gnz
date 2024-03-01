@@ -18,30 +18,46 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+        <?php
+            if(Yii::$app->user->identity->role_id == '3') {
+                echo Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ;
+            }
+        ?>
+    </p> 
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'fio',
             'phone',
             'email:email',
             'login',
-            //'password',
-            //'role_id',
-            //'status_id',
+            'role_id',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, User $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'attribute'=> 'status',
+                //смена статуса вмдна только админу
+                'visible' => (Yii::$app->user->identity->role_id == '1' || Yii::$app->user->identity->role_id == '2')?true:false,
+                'format'=> 'raw',
+                'value'=> function ($data) {
+                    $html = Html::beginForm(Url::to(['update', 'id' => $data->id]));
+                    $html .= Html::activeDropDownList($data, 'status_id', [
+                        2 => 'Подтверждено',
+                        3 => 'Отклонено',
+                    ],
+                    [
+                        'prompt' => [
+                            'text'=> 'new',
+                            'options' => [
+                                'value'=> '1',
+                                'style'=> 'display: none',
+                            ]
+                        ]
+                    ]);
+                    $html .= Html::submitButton('Принять', ['class' => 'btn btn-link']);
+                    $html .= Html::endForm();
+                    return $html;
+                }
             ],
         ],
     ]); ?>
