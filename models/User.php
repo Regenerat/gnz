@@ -19,7 +19,7 @@ use Yii;
  * @property Role $role
  * @property Status $status
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -77,5 +77,76 @@ class User extends \yii\db\ActiveRecord
     public function getStatus()
     {
         return $this->hasOne(Status::class, ['id' => 'status_id']);
+    }
+
+    public static function findIdentity($id)
+    {
+        return static::find()->where(['id' => $id])->one();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthKey()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateAuthKey($authKey)
+    {
+        return null;
+    }
+
+    /**
+     * Validates password
+     *
+     * @param string $password password to validate
+     * @return bool if password provided is valid for current user
+     */
+    public function validatePassword($password)
+    {
+        return $this->password === $password;
+    }
+
+    /**
+     * Функция поиска пользователя по логину и паролю
+     * @param string $login Логин пользователя
+     * @param string $password Пароль пользователя
+     * @return User|null Возвращает пользователя или null, если соответствующего пользователя нет
+     */
+    public static function login($login, $password) {
+        // метод find() возвращает Query-объект (объект построения запроса в бд)
+        // метод where([{column} => {value}]) добавляет условие и возвращает Query-объект (объект построения запроса в бд)
+        // метод one() возвращает экземпляр соответствующего класса, либо null, если не найдено ни одной записи
+        // Может быть заменено на метод findOne([{column} => {value}]), который является alias для find()->where([{column} => {value}])->one()
+        // Происходит поиск пользователя по его логину
+        $user = static::find()->where(['login' => $login])->one();
+
+        // Проверка на пользователя и на совпадение его пароля
+        if ($user && $user->validatePassword($password)) {
+            return $user;
+        }
+
+        // Иначе возвращать null
+        return null;
     }
 }
