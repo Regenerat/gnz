@@ -128,4 +128,16 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionRegister() {
+        $model = new User();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->role_id = Role::USER_ROLE_ID;
+            $model->status_id = Status::NEW_STATUS;
+            if ($model->save()) {
+                return $this->redirect(['site/index']);
+            }
+        }
+        return $this->render('register', ['model' => $model]);
+    } 
 }
