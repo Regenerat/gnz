@@ -33,6 +33,13 @@ class UserController extends Controller
     }
 
     /**
+     * @return User
+     */
+    public function getUser() {
+        return Yii::$app->user->identity;
+    }
+
+    /**
      * Lists all User models.
      *
      * @return string
@@ -43,8 +50,15 @@ class UserController extends Controller
             return $this->goHome();
         }
 
+        $user = self::getUser();
+        $userIds = null;
+
+        if (!$user->isAdmin()) {
+            $userIds = $user->id;
+        }
+
         $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search($this->request->queryParams, $userIds);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

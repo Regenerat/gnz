@@ -149,4 +149,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         // Иначе возвращать null
         return null;
     }
+
+    public function isAdmin() {
+        return ($this->role_id == Role::ADMIN_ROLE_ID || $this->role_id == Role::SUPER_ADMIN_ROLE_ID);
+    }
 }

@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?php
-            if(Yii::$app->user->identity->role_id == '3') {
+            if(Yii::$app->user->identity->role_id == '3...') {
                 echo Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ;
             }
         ?>
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'phone',
             'email:email',
             'login',
-            'role_id',
+            'status',
             [
                 'attribute'=> 'status',
                 //смена статуса вмдна только админу
